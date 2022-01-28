@@ -1,6 +1,6 @@
 from dataclasses import field, fields
 from rest_framework import serializers
-from escola.models import Aluno, Curso
+from escola.models import Aluno, Curso, Matricula
 
 class AlunoSerializer(serializers.ModelSerializer):
     class Meta:
@@ -11,3 +11,25 @@ class CursoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Curso
         fields = '__all__'
+
+class MatriculaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Matricula
+        exclude = []
+
+class ListaMatriculaAlunoSerializer(serializers.ModelSerializer):
+    curso = serializers.ReadOnlyField(source='curso.descricao') # mostrar como string no lugar de id
+    periodo = serializers.SerializerMethodField() # mostrar o nome completo sem a sigla
+    class Meta:
+        model = Matricula
+        fields = ['curso', 'periodo']
+    def get_periodo(self, obj): # necessario para mostrar como string
+        return obj.get_periodo_display()
+
+class ListaMatriculaCursoSerializer(serializers.ModelSerializer):
+    aluno_nome = serializers.ReadOnlyField(source='aluno.nome')
+    class Meta:
+        model = Matricula
+        fields = ['aluno_nome']       
+
+        
